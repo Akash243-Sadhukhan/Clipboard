@@ -32,9 +32,9 @@ class ClipboardGUI(App):
 
     def show_popup(self, data):
         # Only show the popup if the app has fully started
-        if not self.is_started:
-            print("[DEBUG] Event received before app started. Ignoring.")
-            return
+        # if not self.is_started:
+        #     print("[DEBUG] Event received before app started. Ignoring.")
+        #     return
 
         print(f"[DEBUG] 'hotkey_triggered' event received with data: {data}")
         # Use Clock to schedule the popup on the main Kivy thread

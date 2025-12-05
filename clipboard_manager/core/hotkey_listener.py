@@ -2,7 +2,7 @@ import threading
 from pynput import keyboard
 
 class HotkeyListener(threading.Thread):
-    def __init__(self, event_bus):
+    def __init__(self, event_bus, name="HotkeyListener"):
         super().__init__(daemon=True)
         self.event_bus = event_bus
         self.current_keys = set()
@@ -10,42 +10,64 @@ class HotkeyListener(threading.Thread):
 
     def run(self):
         print("[DEBUG] HotkeyListener thread started.")
-        self.listener = keyboard.Listener(on_press=self.on_press, on_release=self.on_release)
+        self.listener = keyboard.Listener(
+            on_press=self.on_press,
+            on_release=self.on_release
+        )
         self.listener.start()
         self.listener.join()
         print("[DEBUG] HotkeyListener thread stopped.")
 
-    def on_press(self, key):
+    # ── Key normalization ──────────────────────────────────
+    def _normalize_key(self, key):
+        """Return a simple string name for a key (e.g., 'ctrl', 'shift', 'v')."""
+        # Modifier keys
+        if key in (keyboard.Key.ctrl, keyboard.Key.ctrl_l, keyboard.Key.ctrl_r):
+            return "ctrl"
+        if key in (keyboard.Key.shift, keyboard.Key.shift_l, keyboard.Key.shift_r):
+            return "shift"
+        if key in (keyboard.Key.alt, keyboard.Key.alt_l, keyboard.Key.alt_r):
+            return "alt"
+
+        # Simple character keys
+        if hasattr(key, "char") and key.char is not None:
+            return key.char.lower()
+
+        # Fallback for other special keys
         if isinstance(key, keyboard.Key):
-            self.current_keys.add(key)
-        elif hasattr(key, 'char'):
-            self.current_keys.add(key.char)
-        print(f"[DEBUG] Keys pressed: {self.current_keys}")
-        self.check_key()
+            return str(key)
+
+        return None
+
+    def on_press(self, key):
+        name = self._normalize_key(key)
+        if name:
+            self.current_keys.add(name)
+            print(f"[DEBUG] Keys pressed: {self.current_keys}")
+            self.check_key()
 
     def on_release(self, key):
-        # Use a try-except block to avoid crashing if the key is not in the set
-        try:
-            if key in self.current_keys:
-                self.current_keys.remove(key)
-            elif hasattr(key, 'char') and key.char in self.current_keys:
-                self.current_keys.remove(key.char)
-        except KeyError:
-            pass # Key was already removed
+        name = self._normalize_key(key)
+        if name and name in self.current_keys:
+            try:
+                self.current_keys.remove(name)
+            except KeyError:
+                pass
 
     def check_key(self):
-        show_hotkey = frozenset([keyboard.Key.ctrl, 'v'])
-        stop_hotkey = frozenset([keyboard.Key.ctrl, 'c'])
+        paste_hotkey = {"ctrl", "v"}          # Ctrl+V
+        stop_hotkey  = {"ctrl", "shift", "c"} # Ctrl+Shift+C
 
-        if show_hotkey.issubset(self.current_keys):
+        if paste_hotkey.issubset(self.current_keys):
             print("[DEBUG] Ctrl+V detected! Emitting event.")
             self.event_bus.emit("hotkey_triggered", {"hotkey": "ctrl+v"})
-            self.current_keys.clear()
-        
+            self.current_keys.clear()  # avoid multiple triggers if held
+
         elif stop_hotkey.issubset(self.current_keys):
-            print("[DEBUG] Ctrl+C detected! Stopping listener.")
+            print("[DEBUG] Ctrl+Shift+C detected! Stopping listener.")
             self.stop()
 
     def stop(self):
         if self.listener:
             self.listener.stop()
+            print("[DEBUG] HotkeyListener stopped.")
