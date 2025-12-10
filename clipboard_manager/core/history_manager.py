@@ -1,8 +1,8 @@
 import threading
 
-class HistoryManager(threading.Thread):
+class HistoryManager:
     def __init__(self, event_bus, max_history=50):
-        super().__init__(daemon=True)
+        # super().__init__(daemon=True)
         self.event_bus = event_bus
         self.max_history = max_history
         self.history = []

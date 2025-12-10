@@ -94,7 +94,8 @@ if __name__ == "__main__":
         else:
             print("This application may require administrative privileges to listen for global hotkeys.")
             print("Please restart the application as an administrator if hotkeys do not work.")
-            sys.exit(1)
+            print("Please restart the application as an administrator if hotkeys do not work.")
+            main()
     else:
         # Linux / others
         main()
