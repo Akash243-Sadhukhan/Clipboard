@@ -24,8 +24,16 @@ class ClipboardGUI(App):
 
     def build(self):
         # Return a FloatLayout as the root widget to satisfy Kivy's requirement
-        # This layout will be invisible until a popup is opened.
-        return FloatLayout()
+        root = FloatLayout()
+        info_text = (
+            "Clipboard Manager Running\n\n"
+            "Ctrl+C: Copy to History\n"
+            "Ctrl+V: Show History Popup\n"
+            "Ctrl+Shift+C: Stop Listener"
+        )
+        label = Label(text=info_text, font_name="DejaVuSansMono", halign="center")
+        root.add_widget(label)
+        return root
 
     def on_start(self):
         """This is a Kivy method that is called once the app is running."""
@@ -56,14 +64,29 @@ class ClipboardGUI(App):
         )
         self.popup.open()
 
-    def _handle_hotkey(self,dt):
-        print("[DEBUG] Handling hotkey action: retrieving clipboard text and updating history.")
-        trigger_copy()  # Simulate Ctrl+C to copy current selection
-        new_clipboard_data = get_clipboard_text()
-        if not new_clipboard_data:
-            print("[DEBUG] Clipboard is empty or unreadable. No action taken.")
-            return
-        self.history_manager.add_to_history(new_clipboard_data)
-        print(f"[DEBUG] New clipboard data added to history: {new_clipboard_data}")
-        self.event_bus.emit("history_updated", {"new_item": new_clipboard_data})
-        self._show_popup_internal()  # Show updated popup
+    def _handle_hotkey(self, data):
+        hotkey = data.get("hotkey")
+        print(f"[DEBUG] Handling hotkey: {hotkey}")
+
+        if hotkey == "ctrl+c":
+            print("[DEBUG] Ctrl+C detected. Capturing clipboard.")
+            trigger_copy()  # Simulate Ctrl+C to ensure we capture
+            # Adding a small delay or retry might be needed if OS is slow, but trigger_copy has sleep.
+            new_clipboard_data = get_clipboard_text()
+            if not new_clipboard_data:
+                print("[DEBUG] Clipboard is empty or unreadable.")
+                return
+            
+            self.history_manager.add_to_history(new_clipboard_data)
+            print(f"[DEBUG] Added to history: {new_clipboard_data}")
+            self.event_bus.emit("history_updated", {"new_item": new_clipboard_data})
+            self._show_popup_internal()
+
+        elif hotkey == "ctrl+v":
+            print("[DEBUG] Ctrl+V detected. Showing history popup.")
+            # For Paste, we might want to just show the popup to allow selection?
+            # Or just let the system paste?
+            # If we show popup, we interrupt system paste unless we pass it through.
+            # But here we just show the history.
+            self._show_popup_internal()
+

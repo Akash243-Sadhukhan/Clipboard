@@ -31,13 +31,23 @@ class HotkeyListener(threading.Thread):
 
         # Simple character keys
         if hasattr(key, "char") and key.char is not None:
-            return key.char.lower()
+            c = key.char
+            # Handle control codes (\x01 - \x1a) -> (a - z)
+            if len(c) == 1 and 1 <= ord(c) <= 26:
+                return chr(ord(c) + 96)
+            return c.lower()
 
         # Fallback for other special keys
         if isinstance(key, keyboard.Key):
-            return str(key)
+            # Clean up 'Key.enter' -> 'enter'
+            return str(key).replace('Key.', '')
+        
+        # Last resort: use the key code if available
+        if hasattr(key, 'vk') and key.vk is not None:
+            # Simple number/letter mapping could go here if needed
+            pass
 
-        return None
+        return str(key)
 
     def on_press(self, key):
         name = self._normalize_key(key)
@@ -59,20 +69,21 @@ class HotkeyListener(threading.Thread):
         paste_hotkey = {"ctrl", "v"}          # Ctrl+v
         stop_hotkey  = {"ctrl", "shift", "c"} # Ctrl+Shift+C
 
-        if paste_hotkey.issubset(self.current_keys):
+        if stop_hotkey.issubset(self.current_keys):
+            print("[DEBUG] Ctrl+Shift+C detected! Stopping listener.")
+            self.stop()
+            self.current_keys.clear()
+
+        elif paste_hotkey.issubset(self.current_keys):
             print("[DEBUG] Ctrl+V detected! Emitting event.")
             self.event_bus.emit("hotkey_triggered", {"hotkey": "ctrl+v"})
             self.current_keys.clear()
 
-        if copy_hotkey.issubset(self.current_keys):
+        elif copy_hotkey.issubset(self.current_keys):
             print("[DEBUG] Ctrl+C detected! Emitting event.")
-            self.event_bus.emit("hotkey_triggered", {"hotkey": "ctrl+C"})
+            self.event_bus.emit("hotkey_triggered", {"hotkey": "ctrl+c"})
             self.current_keys.clear()  # avoid multiple triggers if held
-
-        elif stop_hotkey.issubset(self.current_keys):
-            print("[DEBUG] Ctrl+Shift+C detected! Stopping listener.")
-            self.stop()
-
+    
     def stop(self):
         if self.listener:
             self.listener.stop()
