@@ -52,15 +52,21 @@ class HotkeyListener(threading.Thread):
             try:
                 self.current_keys.remove(name)
             except KeyError:
-                pass
+                print(f"[DEBUG] Key {name} was not in current_keys set.")
 
     def check_key(self):
-        paste_hotkey = {"ctrl", "v"}          # Ctrl+V
+        copy_hotkey = {"ctrl", "c"}          # Ctrl+c
+        paste_hotkey = {"ctrl", "v"}          # Ctrl+v
         stop_hotkey  = {"ctrl", "shift", "c"} # Ctrl+Shift+C
 
         if paste_hotkey.issubset(self.current_keys):
             print("[DEBUG] Ctrl+V detected! Emitting event.")
             self.event_bus.emit("hotkey_triggered", {"hotkey": "ctrl+v"})
+            self.current_keys.clear()
+
+        if copy_hotkey.issubset(self.current_keys):
+            print("[DEBUG] Ctrl+C detected! Emitting event.")
+            self.event_bus.emit("hotkey_triggered", {"hotkey": "ctrl+C"})
             self.current_keys.clear()  # avoid multiple triggers if held
 
         elif stop_hotkey.issubset(self.current_keys):

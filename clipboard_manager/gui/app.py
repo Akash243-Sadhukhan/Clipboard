@@ -6,6 +6,8 @@ from kivy.clock import Clock
 from kivy.core.text import LabelBase
 from kivy.uix.floatlayout import FloatLayout # Import FloatLayout
 
+from core.clipboard_actions import trigger_copy, get_clipboard_text
+
 # Construct an absolute path to the font file
 font_path = os.path.join(os.path.dirname(__file__), 'DejaVuSansMono.ttf')
 LabelBase.register(name='DejaVuSansMono', fn_regular=font_path)
@@ -38,7 +40,7 @@ class ClipboardGUI(App):
 
         print(f"[DEBUG] 'hotkey_triggered' event received with data: {data}")
         # Use Clock to schedule the popup on the main Kivy thread
-        Clock.schedule_once(lambda dt: self._show_popup_internal())
+        Clock.schedule_once(lambda dt: self._handle_hotkey(data))
 
     def _show_popup_internal(self):
         print("[DEBUG] Showing popup.")
@@ -53,3 +55,15 @@ class ClipboardGUI(App):
             size_hint=(0.4, 0.4)
         )
         self.popup.open()
+
+    def _handle_hotkey(self,dt):
+        print("[DEBUG] Handling hotkey action: retrieving clipboard text and updating history.")
+        trigger_copy()  # Simulate Ctrl+C to copy current selection
+        new_clipboard_data = get_clipboard_text()
+        if not new_clipboard_data:
+            print("[DEBUG] Clipboard is empty or unreadable. No action taken.")
+            return
+        self.history_manager.add_to_history(new_clipboard_data)
+        print(f"[DEBUG] New clipboard data added to history: {new_clipboard_data}")
+        self.event_bus.emit("history_updated", {"new_item": new_clipboard_data})
+        self._show_popup_internal()  # Show updated popup

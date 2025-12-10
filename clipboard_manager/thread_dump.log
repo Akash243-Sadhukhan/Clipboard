@@ -1,6 +1,6 @@
-=== THREAD SNAPSHOT AT 20:49:34 ===
+=== THREAD SNAPSHOT AT 19:50:33 ===
 
---- Thread: Thread-2 (ID: 6172553216) ---
+--- Thread: Thread-3 (ID: 6233337856) ---
   File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/threading.py", line 1012, in _bootstrap
     self._bootstrap_inner()
   File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/threading.py", line 1041, in _bootstrap_inner
@@ -12,7 +12,7 @@
   File "/Users/akash/Documents/Clipboard/clip_env/lib/python3.13/site-packages/pynput/_util/darwin.py", line 235, in _run
     result = CFRunLoopRunInMode(
 
---- Thread: Thread-1 (ID: 6155726848) ---
+--- Thread: Thread-2 (ID: 6216511488) ---
   File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/threading.py", line 1012, in _bootstrap
     self._bootstrap_inner()
   File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/threading.py", line 1041, in _bootstrap_inner
@@ -24,17 +24,17 @@
   File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/threading.py", line 1092, in join
     self._handle.join(timeout)
 
---- Thread: monitor_thread (ID: 6138900480) ---
+--- Thread: monitor_thread (ID: 6199685120) ---
   File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/threading.py", line 1012, in _bootstrap
     self._bootstrap_inner()
   File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/threading.py", line 1041, in _bootstrap_inner
     self.run()
   File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/threading.py", line 992, in run
     self._target(*self._args, **self._kwargs)
-  File "/Users/akash/Documents/Clipboard/clipboard_manager/main.py", line 40, in log_thread_stacks
+  File "/Users/akash/Documents/Clipboard/clipboard_manager/main.py", line 39, in log_thread_stacks
     stack = traceback.format_stack(frame)
 
---- Thread: event_bus (ID: 6122074112) ---
+--- Thread: event_bus (ID: 6182858752) ---
   File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/threading.py", line 1012, in _bootstrap
     self._bootstrap_inner()
   File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/threading.py", line 1041, in _bootstrap_inner
@@ -49,9 +49,9 @@
     waiter.acquire()
 
 --- Thread: MainThread (ID: 8532729984) ---
-  File "/Users/akash/Documents/Clipboard/clipboard_manager/main.py", line 90, in <module>
+  File "/Users/akash/Documents/Clipboard/clipboard_manager/main.py", line 89, in <module>
     main()
-  File "/Users/akash/Documents/Clipboard/clipboard_manager/main.py", line 76, in main
+  File "/Users/akash/Documents/Clipboard/clipboard_manager/main.py", line 75, in main
     clipboard_gui.run()
   File "/Users/akash/Documents/Clipboard/clip_env/lib/python3.13/site-packages/kivy/app.py", line 956, in run
     runTouchApp()

@@ -7,12 +7,11 @@ import time
 
 from core.Event_bus import EventBus
 from core.hotkey_listener import HotkeyListener
+from core.history_manager import HistoryManager
 from gui.app import ClipboardGUI
 
+
 # Temporary until you plug in the real one
-class PlaceholderHistoryManager:
-    def get_history(self):
-        return ["Clipboard Item 1", "Clipboard Item 2", "Another Item"]
 
 def is_admin():
     """Check if the script is running with administrative privileges (Windows only)."""
@@ -49,7 +48,7 @@ def main():
 
     # 1. Core objects
     event_bus = EventBus()
-    history_manager = PlaceholderHistoryManager()  # replace later with real HistoryManager
+    history_manager = HistoryManager(event_bus=event_bus)  # replace later with real HistoryManager
 
     # 2. Start EventBus processing in a background thread
     event_bus_thread = threading.Thread(target=event_bus.start, name="event_bus",daemon=True)

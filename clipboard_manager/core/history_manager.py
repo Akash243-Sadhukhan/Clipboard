@@ -16,4 +16,4 @@ class HistoryManager(threading.Thread):
                 self.history.pop()
 
     def get_history(self):
-        return self.history
+        return self.history.copy()
